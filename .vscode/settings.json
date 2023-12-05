@@ -4,5 +4,14 @@
     "source.fixAll.eslint": true
   },
   "editor.rulers": [ 140 ],
-  "eslint.enable": true
+  "eslint.enable": true,
+  "workbench.colorCustomizations": {
+    "terminal.ansiBlue": "#ADADAD",
+    "terminal.ansiBlack": "#424242",
+    "terminal.background": "#121212",
+    "terminal.foreground": "#2ae911",
+    "activityBar.background": "#501151",
+    "titleBar.activeBackground": "#701772",
+    "titleBar.activeForeground": "#FEFCFE"
+  }
 }
