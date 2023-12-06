@@ -88,13 +88,13 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
 
       const [temperatureSensors, humiditySensors] = this.parseDevices(await response.json());
       return [temperatureSensors, humiditySensors];
-    } catch(error){
-        let message
-        if (error instanceof Error) {
-          message = error.message
-        } else {
-          message = String(error)
-        }
+    } catch(error) {
+      let message;
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
       throw new Error(message);
     }
   }
