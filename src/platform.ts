@@ -75,18 +75,22 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
   async fetchDevices() {
     this.log.info('Fetching sensors from Ambient Weather API');
 
-    const url = `https://rt.ambientweather.net/v1/devices?applicationKey=${this.config.applicationKey}&apiKey=${this.config.apiKey}`;
-    const response = await fetch(url);
+    try {
+      const url = `https://rt.ambientweather.net/v1/devices?applicationKey=${this.config.applicationKey}&apiKey=${this.config.apiKey}`;
+      const response = await fetch(url);
 
-    // request is being throttled
-    if (response.status === 429) {
-      this.log.debug('429 throttle waiting 1000ms to retry');
-      await this.sleep(1000);
-      return this.fetchDevices();
+      // request is being throttled
+      if (response.status === 429) {
+        this.log.debug('429 throttle waiting 1000ms to retry');
+        await this.sleep(1000);
+        return this.fetchDevices();
+      }
+
+      const [temperatureSensors, humiditySensors] = this.parseDevices(await response.json());
+      return [temperatureSensors, humiditySensors];
+    } catch(error: any){
+      throw new Error(String(error.message));
     }
-
-    const [temperatureSensors, humiditySensors] = this.parseDevices(await response.json());
-    return [temperatureSensors, humiditySensors];
   }
 
   async discoverDevices() {
