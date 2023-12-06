@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge Ambient Weather Sensors",
   "name": "homebridge-ambient-weather-sensors",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Utilizes the ambient weather API to retrie sensor information.",
   "license": "Apache-2.0",
   "repository": {
