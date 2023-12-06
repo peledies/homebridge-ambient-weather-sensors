@@ -75,11 +75,6 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
 
   sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
-  cacheIsValid(cache) {
-    const now = Date.now();
-    return now - cache.cache_time < cache.ttl;
-  }
-
   async fetchDevices() {
     this.log.debug('Fetching sensors from Ambient Weather API');
 
