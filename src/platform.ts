@@ -1,16 +1,19 @@
 import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 
+import { Cache } from './cache';
 import { HumidityAccessory } from './humidityAccessory';
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { TemperatureAccessory } from './temperatureAccessory';
 import { DEVICE } from './types';
-
 
 import fetch from 'node-fetch';
 
 export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+  private readonly CacheFile: string = `${this.api.user.storagePath()}/${this.config.platform}.json`;
+
+  private readonly Cache = new Cache(this.CacheFile, 2 * 60 * 1000, this.log);
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -73,7 +76,18 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
   sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
   async fetchDevices() {
-    this.log.info('Fetching sensors from Ambient Weather API');
+    this.log.debug('Fetching sensors from Ambient Weather API');
+
+    // read cache
+    const cache = this.Cache.read();
+
+    // validate cache
+    if (this.Cache.isValid(cache)) {
+      this.log.debug('USING DISK CACHE FOR DATA');
+
+      const [temperatureSensors, humiditySensors] = this.parseDevices(cache.data);
+      return [temperatureSensors, humiditySensors];
+    }
 
     try {
       const url = `https://rt.ambientweather.net/v1/devices?applicationKey=${this.config.applicationKey}&apiKey=${this.config.apiKey}`;
@@ -86,7 +100,10 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
         return this.fetchDevices();
       }
 
-      const [temperatureSensors, humiditySensors] = this.parseDevices(await response.json());
+      const data = await response.json();
+      this.Cache.write(data);
+
+      const [temperatureSensors, humiditySensors] = this.parseDevices(data);
       return [temperatureSensors, humiditySensors];
     } catch(error) {
       let message;
