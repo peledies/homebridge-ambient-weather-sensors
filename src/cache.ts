@@ -4,6 +4,8 @@ import fs from 'fs';
 
 export class Cache {
 
+  private valid = false;
+
   constructor(
     public readonly CacheFile: string,
     public readonly ttl: number,
@@ -51,8 +53,15 @@ export class Cache {
     }
   }
 
-  isValid(cache) {
-    const now = Date.now();
-    return now - cache.cache_time < cache.ttl;
+  isValid() {
+    fs.access(this.CacheFile, fs.constants.F_OK | fs.constants.W_OK, (err) => {
+      if (!err) {
+        const cache = this.read();
+        const now = Date.now();
+        this.valid = now - cache.cache_time < cache.ttl;
+      }
+    });
+
+    return this.valid;
   }
 }

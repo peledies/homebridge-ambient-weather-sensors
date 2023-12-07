@@ -78,11 +78,11 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
   async fetchDevices() {
     this.log.debug('Fetching sensors from Ambient Weather API');
 
-    // read cache
-    const cache = this.Cache.read();
-
     // validate cache
-    if (this.Cache.isValid(cache)) {
+    if (this.Cache.isValid()) {
+      // read cache
+      const cache = this.Cache.read();
+
       this.log.debug('USING DISK CACHE FOR DATA');
 
       const [temperatureSensors, humiditySensors] = this.parseDevices(cache.data);
