@@ -16,13 +16,13 @@
         "title": "API Key",
         "type": "string",
         "required": true,
-        "default": "api key from ambient weather account"
+        "placeholder": "api key from ambient weather account"
       },
       "applicationKey": {
         "title": "Aplication Key",
         "type": "string",
         "required": true,
-        "default": "application key from ambient weather account"
+        "placeholder": "application key from ambient weather account"
       },
       "temperatureSensors": {
         "title": "Temperature Sensors",
