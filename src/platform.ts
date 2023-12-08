@@ -41,36 +41,49 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
   parseDevices(json) {
     const humiditySensors:DEVICE[] = [];
     const temperatureSensors:DEVICE[] = [];
+    const Devices:DEVICE[] = [];
 
     let temperatureDevices;
     let humidityDevices;
+    // const Devices = [];
 
     if (Array.isArray(json)) {
       json.forEach( (obj) => {
-        temperatureDevices = Object.fromEntries(Object.entries(obj.lastData).filter(([key]) => key.includes('temp')));
-
-        Object.entries(temperatureDevices).forEach( (device) => {
-          temperatureSensors.push({
+        Object.entries(obj.lastData).forEach( (device) => {
+          Devices.push({
             macAddress: obj.macAddress,
             uniqueId: `${obj.macAddress}-${device[0]}`,
             displayName: `${obj.macAddress}-${device[0]}`,
+            type: (device[0].includes('temp')) ? 'Temperature' : 'Humidity',
             value: device[1] as number,
           });
         });
+        // temperatureDevices = Object.fromEntries(Object.entries(obj.lastData).filter(([key]) => key.includes('temp')));
+
+        // Object.entries(temperatureDevices).forEach( (device) => {
+        //   temperatureSensors.push({
+        //     macAddress: obj.macAddress,
+        //     uniqueId: `${obj.macAddress}-${device[0]}`,
+        //     displayName: `${obj.macAddress}-${device[0]}`,
+        //     value: device[1] as number,
+        //   });
+        // });
 
 
-        humidityDevices = Object.fromEntries(Object.entries(obj.lastData).filter(([key]) => key.includes('humid')));
-        Object.entries(humidityDevices).forEach( (device) => {
-          humiditySensors.push({
-            macAddress: obj.macAddress,
-            uniqueId: `${obj.macAddress}-${device[0]}`,
-            displayName: `${obj.macAddress}-${device[0]}`,
-            value: device[1] as number,
-          });
-        });
+        // humidityDevices = Object.fromEntries(Object.entries(obj.lastData).filter(([key]) => key.includes('humid')));
+        // Object.entries(humidityDevices).forEach( (device) => {
+        //   humiditySensors.push({
+        //     macAddress: obj.macAddress,
+        //     uniqueId: `${obj.macAddress}-${device[0]}`,
+        //     displayName: `${obj.macAddress}-${device[0]}`,
+        //     value: device[1] as number,
+        //   });
+        // });
       });
     }
-    return [temperatureSensors, humiditySensors];
+
+    return [Devices];
+    // return [temperatureSensors, humiditySensors];
   }
 
   sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
@@ -86,6 +99,9 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
       this.log.debug('USING DISK CACHE FOR DATA');
 
       const [temperatureSensors, humiditySensors] = this.parseDevices(cache.data);
+
+      console.log(temperatureSensors, humiditySensors);
+
       return [temperatureSensors, humiditySensors];
     }
 
