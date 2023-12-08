@@ -11,7 +11,7 @@ import fetch from 'node-fetch';
 export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
-  private readonly CacheFile: string = `${this.api.user.storagePath()}/${this.config.platform}.json`;
+  private readonly CacheFile: string = `${this.api.user.storagePath()}/${this.config.platform}-${this.config.apiKey}.json`;
 
   private readonly Cache = new Cache(this.CacheFile, 2 * 60 * 1000, this.log);
 
