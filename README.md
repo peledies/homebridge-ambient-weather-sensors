@@ -8,6 +8,10 @@
 ## Complete HomeKit support for the Ambient Weather weather station ecosystem using [Homebridge](https://homebridge.io).
 
 [![verified-by-homebridge](https://img.shields.io/badge/homebridge-verified-blueviolet?color=%23491F59&style=for-the-badge&logoColor=%23FFFFFF&logo=homebridge)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+![npm](https://img.shields.io/npm/dt/homebridge-ambient-weather-sensors?style=for-the-badge)
+![NPM](https://img.shields.io/npm/l/homebridge-ambient-weather-sensors?style=for-the-badge)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/peledies/homebridge-ambient-weather-sensors?style=for-the-badge&label=Latest)
+![Discord](https://img.shields.io/discord/432663330281226270?style=for-the-badge&label=Discord)
 
 </DIV>
 </SPAN>
