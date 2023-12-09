@@ -3,7 +3,7 @@
 <SPAN ALIGN="CENTER" STYLE="text-align:center">
 <DIV ALIGN="CENTER" STYLE="text-align:center">
 
-[![Homebridge-Ambient-Weather-Sensors: Native HomeKit support for Ambient Weather Sensors](https://raw.githubusercontent.com/peledies/homebridge-ambient-weather-sensors/main/images/ambient_weather_logo.png)](https://github.com/peledies/homebridge-ambient-weather-sensors)
+[![Homebridge-Ambient-Weather-Sensors: Native HomeKit support for Ambient Weather Sensors](https://raw.githubusercontent.com/peledies/homebridge-ambient-weather-sensors/main/images/homebridge_ambient_weather.png)](https://github.com/peledies/homebridge-ambient-weather-sensors)
 
 
 ## Complete HomeKit support for the Ambient Weather weather station ecosystem using [Homebridge](https://homebridge.io).
