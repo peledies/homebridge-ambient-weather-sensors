@@ -122,7 +122,7 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
       } else {
         message = String(error);
       }
-      throw new Error(message);
+      this.log.error('ERROR:', message);
     }
   }
 
@@ -205,7 +205,7 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
       } else {
         message = String(error);
       }
-      throw new Error(message);
+      this.log.error('ERROR:', message);
     }
   }
 }
