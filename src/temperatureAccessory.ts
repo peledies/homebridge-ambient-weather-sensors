@@ -47,9 +47,9 @@ export class TemperatureAccessory {
   private async updateData(): Promise<void> {
     this.platform.log.debug('Updating CurrentTemperature Data');
 
-    const [temperatureSensors] = await this.platform.fetchDevices();
+    const Devices = await this.platform.fetchDevices();
 
-    const sensor = temperatureSensors.filter( (o: DEVICE) => {
+    const sensor = Devices.filter( (o: DEVICE) => {
       return o.uniqueId === this.accessory.context.device.uniqueId;
     });
 
