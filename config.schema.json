@@ -35,6 +35,12 @@
         "type": "boolean",
         "required": false,
         "default": false
+      },
+      "solarRadiationSensors": {
+        "title": "Solar Radiation Sensors",
+        "type": "boolean",
+        "required": false,
+        "default": false
       }
     }
   }

@@ -3,4 +3,5 @@ export type DEVICE = {
   uniqueId: string;
   displayName: string;
   value: number;
+  type: string;
 };
