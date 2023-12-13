@@ -27,6 +27,7 @@ This plugin allows you to pull sensor data from your Ambient Weather weather sta
 ## Current Supported Sensor Types
 - Temperature
 - Humidity
+- Solar Radiation (As Lux)
 
 ## Future Supported Sensor Types
 - Air Pressure
