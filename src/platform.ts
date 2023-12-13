@@ -131,9 +131,31 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
     }
   }
 
+  deregisterAccessories(Devices: DEVICE[]){
+    const currentDevices = Devices.map((device) => {
+      return device.displayName;
+    });
+
+    const cacheMatch = this.accessories.filter( (accessory) => {
+      return !currentDevices.includes(accessory.displayName);
+    });
+
+    cacheMatch.map( (accessory) => {
+      this.log.info(`De-registering accessory [${accessory.displayName}]. It was either not found in the API response,
+      or the sensor type has been disabled in the plugin configuration`);
+
+      // remove platform accessories when no longer present
+      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+    });
+  }
+
   async discoverDevices() {
     try {
+
       const Devices = await this.fetchDevices();
+
+      // remove any existing accessories that arent returned by the API
+      this.deregisterAccessories(Devices);
 
       this.log.debug(`TEMPERATURE SENSORS: ${this.config.temperatureSensors}`);
       this.log.debug(`HUMIDITY SENSORS: ${this.config.humiditySensors}`);
@@ -169,8 +191,12 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
           // the `context` property can be used to store any data about the accessory you may need
           accessory.context.device = device;
 
-          if (this.config.temperatureSensors && accessory.context.device.type === 'Temperature') {
+          if (accessory.context.device.type === 'Temperature') {
             new TemperatureAccessory(this, accessory);
+          } else if (accessory.context.device.type === 'Humidity') {
+            new HumidityAccessory(this, accessory);
+          } else if (accessory.context.device.type === 'Solar Radiation') {
+            new SolarRadiationAccessory(this, accessory);
           }
 
           // link the accessory to your platform
