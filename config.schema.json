@@ -3,6 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Ambient Weather plug-in for [Homebridge](https://github.com/peledies/homebridge-ambient-weather-sensors) using the HTTP Rest API",
+  "footerDisplay": "[Ambient Weather Dashboard](https://ambientweather.net/dashboard)",
   "schema": {
     "type": "object",
     "properties": {
@@ -19,7 +20,7 @@
         "placeholder": "api key from ambient weather account"
       },
       "applicationKey": {
-        "title": "Aplication Key",
+        "title": "Application Key",
         "type": "string",
         "required": true,
         "placeholder": "application key from ambient weather account"
