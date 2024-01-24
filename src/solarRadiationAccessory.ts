@@ -26,6 +26,13 @@ export class SolarRadiationAccessory {
     // set the service name, this is what is displayed as the default name on the Home app
     this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.displayName);
 
+    const char = this.service.getCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel);
+
+    // allow setting lux to zero, because you know... it's dark at night
+    char.setProps({
+      minValue: 0,
+    });
+
     this.updateData();
     setInterval(this.updateData.bind(this), 2 * 60 * 1000);
   }
@@ -53,6 +60,7 @@ export class SolarRadiationAccessory {
 
     // to convert W/m2 to Lux we must devide by 0.0079
     const value = Math.round(sensor[0].value / 0.0079);
+
     this.platform.log.debug(`SET CurrentSolarRadiation: ${value}`);
     this.service.setCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, value)
       .setCharacteristic(this.platform.Characteristic.ProductData, `${sensor[0].value} W/m2`);
