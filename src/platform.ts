@@ -108,6 +108,7 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
     try {
       const url = `https://rt.ambientweather.net/v1/devices?applicationKey=${this.config.applicationKey}&apiKey=${this.config.apiKey}`;
       const response = await fetch(url);
+      let data = null;
 
       // request is being throttled
       if (response.status === 429) {
@@ -116,7 +117,13 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
         return this.fetchDevices();
       }
 
-      const data = await response.json();
+      // response is not JSON
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        data = await response.json();
+      } else {
+        throw new Error('API response from AWN is not JSON. This is caused when the AWN API is down or has some other problem.');
+      }
+
       this.Cache.write(data);
 
       return this.parseDevices(data);
