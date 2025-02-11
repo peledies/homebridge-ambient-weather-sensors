@@ -108,6 +108,7 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
     try {
       const url = `https://rt.ambientweather.net/v1/devices?applicationKey=${this.config.applicationKey}&apiKey=${this.config.apiKey}`;
       const response = await fetch(url);
+      let data = null;
 
       // request is being throttled
       if (response.status === 429) {
@@ -116,7 +117,15 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
         return this.fetchDevices();
       }
 
-      const data = await response.json();
+      // response is not JSON
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        data = await response.json();
+      } else {
+        throw new Error(`API response from AWN is not JSON.
+          This happens ocasionally due to the fragility of the AWN API
+          and is usually resolved by retrying the request in a few minutes.`);
+      }
+
       this.Cache.write(data);
 
       return this.parseDevices(data);
@@ -154,8 +163,12 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
 
       const Devices = await this.fetchDevices();
 
-      // remove any existing accessories that arent returned by the API
-      this.deregisterAccessories(Devices);
+      // if no devices were returned from the AWN API we can assume that either the user has no devices or the API is down
+      if (!Devices) {
+        this.log.debug('No devices returned from the AWN API. Retrying in 60 seconds');
+        await this.sleep(60000);
+        return this.discoverDevices();
+      }
 
       this.log.debug(`TEMPERATURE SENSORS: ${this.config.temperatureSensors}`);
       this.log.debug(`HUMIDITY SENSORS: ${this.config.humiditySensors}`);
@@ -163,44 +176,49 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
       this.log.debug(`WIND SENSORS: ${this.config.windSensors}`);
       this.log.debug(`SOLAR RADIATION SENSORS: ${this.config.solarRadiationSensors}`);
 
-      // loop over the discovered devices and register each one if it has not already been registered
-      for (const device of Devices) {
+      if (Devices) {
+        // remove any existing accessories that arent returned by the API
+        this.deregisterAccessories(Devices);
 
-        const uuid = this.api.hap.uuid.generate(device.uniqueId);
-        const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+        // loop over the discovered devices and register each one if it has not already been registered
+        for (const device of Devices) {
 
-        if (existingAccessory) {
-          // the accessory already exists
-          this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+          const uuid = this.api.hap.uuid.generate(device.uniqueId);
+          const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
 
-          if (existingAccessory.context.device.type === 'Temperature') {
-            new TemperatureAccessory(this, existingAccessory);
-          } else if (existingAccessory.context.device.type === 'Humidity') {
-            new HumidityAccessory(this, existingAccessory);
-          } else if (existingAccessory.context.device.type === 'Solar Radiation') {
-            new SolarRadiationAccessory(this, existingAccessory);
+          if (existingAccessory) {
+            // the accessory already exists
+            this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+
+            if (existingAccessory.context.device.type === 'Temperature') {
+              new TemperatureAccessory(this, existingAccessory);
+            } else if (existingAccessory.context.device.type === 'Humidity') {
+              new HumidityAccessory(this, existingAccessory);
+            } else if (existingAccessory.context.device.type === 'Solar Radiation') {
+              new SolarRadiationAccessory(this, existingAccessory);
+            }
+          } else {
+            // the accessory does not yet exist, so we need to create it
+            this.log.info('Adding new accessory:', device.displayName);
+
+            // create a new accessory
+            const accessory = new this.api.platformAccessory(device.displayName, uuid);
+
+            // store a copy of the device object in the `accessory.context`
+            // the `context` property can be used to store any data about the accessory you may need
+            accessory.context.device = device;
+
+            if (accessory.context.device.type === 'Temperature') {
+              new TemperatureAccessory(this, accessory);
+            } else if (accessory.context.device.type === 'Humidity') {
+              new HumidityAccessory(this, accessory);
+            } else if (accessory.context.device.type === 'Solar Radiation') {
+              new SolarRadiationAccessory(this, accessory);
+            }
+
+            // link the accessory to your platform
+            this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
           }
-        } else {
-          // the accessory does not yet exist, so we need to create it
-          this.log.info('Adding new accessory:', device.displayName);
-
-          // create a new accessory
-          const accessory = new this.api.platformAccessory(device.displayName, uuid);
-
-          // store a copy of the device object in the `accessory.context`
-          // the `context` property can be used to store any data about the accessory you may need
-          accessory.context.device = device;
-
-          if (accessory.context.device.type === 'Temperature') {
-            new TemperatureAccessory(this, accessory);
-          } else if (accessory.context.device.type === 'Humidity') {
-            new HumidityAccessory(this, accessory);
-          } else if (accessory.context.device.type === 'Solar Radiation') {
-            new SolarRadiationAccessory(this, accessory);
-          }
-
-          // link the accessory to your platform
-          this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         }
       }
     } catch(error) {

@@ -22,23 +22,21 @@ $ npm run build
 
 ### Link To Homebridge
 
-Run this command so your global installation of Homebridge can discover the plugin in your development environment:
+> Linking does not work as the original documentation describes because you
+> are likely running this dev envrionment on a real computer and not a
+> raspberry pi with the HB image. The following is a workaround.
 
-```shell
-$ npm link
+```
+sudo npx hb-service install
+npm run watch
+# Ctrl + C to stop the homebridge instance after it finishes its boot
+sudo npx hb-service uninstall
 ```
 
-You can now start Homebridge, use the `-D` flag, so you can see debug log messages in your plugin:
-
-
-npm install homebridge
-npm install -D homebridge-config-ui-x
-sudo hb-service install
-sudo hb-service uninstall
-
-
-```shell
-$ homebridge -D
+At this point the module has been linked and live refreshes should work with
+the following command:
+```
+npm run watch
 ```
 
 ### Watch For Changes and Build Automatically
@@ -53,11 +51,15 @@ If you want to have your code compile automatically as you make changes, and res
             "port": 8581,
             "platform": "config"
         },
-        {
-            "name": "homebridge-ambient-weather-sensors",
-            "platform": "AmbientWeatherSensors"
-            //... any other options, as listed in config.schema.json ...
-        }
+    {
+        "name": "AmbientWeatherSensors",
+        "apiKey": "REDACTED",
+        "applicationKey": "REDACTED",
+        "temperatureSensors": true,
+        "humiditySensors": false,
+        "solarRadiationSensors": true,
+        "platform": "AmbientWeatherSensors"
+    }
     ]
 }
 ```
@@ -93,7 +95,7 @@ You can use the `npm version` command to help you with this:
 $ npm version major
 
 # minor update / new features
-$ npm version update
+$ npm version minor
 
 # patch / bugfixes
 $ npm version patch
