@@ -95,7 +95,7 @@ You can use the `npm version` command to help you with this:
 $ npm version major
 
 # minor update / new features
-$ npm version update
+$ npm version minor
 
 # patch / bugfixes
 $ npm version patch
