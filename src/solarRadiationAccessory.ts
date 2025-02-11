@@ -31,7 +31,7 @@ export class SolarRadiationAccessory {
     // allow setting lux to zero, because you know... it's dark at night
     char.setProps({
       minValue: 0,
-      maxValue: 200000
+      maxValue: 200000,
     });
 
     this.updateData();
