@@ -46,15 +46,17 @@ export class TemperatureAccessory {
 
   private async updateData(): Promise<void> {
     this.platform.log.debug('Updating CurrentTemperature Data');
-
-    const Devices = await this.platform.fetchDevices();
-
-    const sensor = Devices.filter( (o: DEVICE) => {
-      return o.uniqueId === this.accessory.context.device.uniqueId;
-    });
-
-    const value = sensor[0].value;
-    this.platform.log.debug(`SET CurrentTemperature: ${value}`);
-    this.service.setCharacteristic(this.platform.Characteristic.CurrentTemperature, this.fahrenheitToCelsius(value));
+    try {
+      const Devices = await this.platform.fetchDevices();
+      const sensor = Devices.filter( (o: DEVICE) => {
+        return o.uniqueId === this.accessory.context.device.uniqueId;
+      });
+      const value = sensor[0].value;
+      this.platform.log.debug(`SET CurrentTemperature: ${value}`);
+      this.service.setCharacteristic(this.platform.Characteristic.CurrentTemperature, this.fahrenheitToCelsius(value));
+    } catch (error) {
+      // throw new Error('Error updating Current Temperature Data. This likely means the AWN API is down or didn\'t return valid JSON.');
+      this.platform.log.warn('Updating Current Temperature Data Failed. This likely means the AWN API is down or didnt return valid JSON.');
+    }
   }
 }

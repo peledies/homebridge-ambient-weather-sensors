@@ -53,17 +53,22 @@ export class SolarRadiationAccessory {
   private async updateData(): Promise<void> {
     this.platform.log.debug('Updating Solar Radiation Data');
 
-    const sensors = await this.platform.fetchDevices();
+    try {
+      const sensors = await this.platform.fetchDevices();
 
-    const sensor = sensors.filter( (o: DEVICE) => {
-      return o.uniqueId === this.accessory.context.device.uniqueId;
-    });
+      const sensor = sensors.filter( (o: DEVICE) => {
+        return o.uniqueId === this.accessory.context.device.uniqueId;
+      });
 
-    // to convert W/m2 to Lux we must devide by 0.0079
-    const value = Math.round(sensor[0].value / 0.0079);
+      // to convert W/m2 to Lux we must devide by 0.0079
+      const value = Math.round(sensor[0].value / 0.0079);
 
-    this.platform.log.debug(`SET CurrentSolarRadiation: ${value}`);
-    this.service.setCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, value)
-      .setCharacteristic(this.platform.Characteristic.ProductData, `${sensor[0].value} W/m2`);
+      this.platform.log.debug(`SET CurrentSolarRadiation: ${value}`);
+      this.service.setCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, value)
+        .setCharacteristic(this.platform.Characteristic.ProductData, `${sensor[0].value} W/m2`);
+    } catch (error) {
+      // throw new Error('Error updating Solar Radiation Data. This likely means the AWN API is down or didn\'t return valid JSON.');
+      this.platform.log.warn('Updating Solar Radiation Data Failed. This likely means the AWN API is down or didnt return valid JSON.');
+    }
   }
 }

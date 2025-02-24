@@ -44,14 +44,19 @@ export class HumidityAccessory {
   private async updateData(): Promise<void> {
     this.platform.log.debug('Updating CurrentHumidity Data');
 
-    const Devices = await this.platform.fetchDevices();
+    try {
+      const Devices = await this.platform.fetchDevices();
 
-    const sensor = Devices.filter( (o: DEVICE) => {
-      return o.uniqueId === this.accessory.context.device.uniqueId;
-    });
+      const sensor = Devices.filter( (o: DEVICE) => {
+        return o.uniqueId === this.accessory.context.device.uniqueId;
+      });
 
-    const value = sensor[0].value;
-    this.platform.log.debug(`SET CurrentHumidity: ${value}`);
-    this.service.setCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, value);
+      const value = sensor[0].value;
+      this.platform.log.debug(`SET CurrentHumidity: ${value}`);
+      this.service.setCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, value);
+    } catch (error) {
+      // throw new Error('Error updating Current Humidity Data. This likely means the AWN API is down or didn\'t return valid JSON.');
+      this.platform.log.warn('Updating Current Humidity Data Failed. This likely means the AWN API is down or didnt return valid JSON.');
+    }
   }
 }

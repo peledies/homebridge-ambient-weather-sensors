@@ -24,6 +24,7 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
     public readonly config: PlatformConfig,
     public readonly api: API,
   ) {
+
     this.log.debug('Finished initializing platform:', this.config.platform);
 
     this.api.on('didFinishLaunching', () => {
@@ -120,13 +121,12 @@ export class AmbientWeatherSensorsPlatform implements DynamicPlatformPlugin {
       // response is not JSON
       if (response.headers.get('content-type')?.includes('application/json')) {
         data = await response.json();
+        this.Cache.write(data);
       } else {
         throw new Error(`API response from AWN is not JSON.
-          This happens ocasionally due to the fragility of the AWN API
-          and is usually resolved by retrying the request in a few minutes.`);
+          This happens ocasionally due to the fragility of the AWN API and is usually resolved by retrying the request in a few minutes.`);
       }
 
-      this.Cache.write(data);
 
       return this.parseDevices(data);
     } catch(error) {
